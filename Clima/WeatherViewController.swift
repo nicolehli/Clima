@@ -11,19 +11,19 @@ import CoreLocation
 import SwiftyJSON
 import Alamofire
 
-class WeatherViewController: UIViewController, CLLocationManagerDelegate {
-    // 1 Implementing a Delegate
+class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate {
+    
     
     //Constants
     let WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
-    let APP_ID = "12da2f6205f3976bb4787383dd8a69ec"
+    let APP_ID = "12da2f6205f3976bb4787383dd8a69ec000"
     
 
     //TODO: Declare instance variables here
     let locationManager = CLLocationManager()  // 2 Implementing a Delegate create object
     let weatherDataModel = WeatherDataModel()
-
     
+ 
     //Pre-linked IBOutlets
     @IBOutlet weak var weatherIcon: UIImageView!
     @IBOutlet weak var cityLabel: UILabel!
@@ -99,7 +99,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     //Write the updateUIWithWeatherData method here:
     func updateUIWithWeatherData() {
         cityLabel.text = weatherDataModel.city
-        temperatureLabel.text = "\(weatherDataModel.temperature)"
+        temperatureLabel.text = "\(weatherDataModel.temperature)º"
         weatherIcon.image = UIImage(named: weatherDataModel.weatherIconName)
     }
     
@@ -140,11 +140,22 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     
     //Write the userEnteredANewCityName Delegate method here:
+    func userEnteredANewCity(city: String) {
+        let params : [String: String] = ["q": city, "appid": APP_ID]
+        getWeatherData(url: WEATHER_URL, parameters: params)
+    }
     
+
 
     
     //Write the PrepareForSegue Method here
-    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "changeCityNameSegue" {
+            // set destination view controller 
+            let destinationVC = segue.destination as! ChangeCityViewController
+            destinationVC.delegate = self
+        } 
+    }
     
     
     
