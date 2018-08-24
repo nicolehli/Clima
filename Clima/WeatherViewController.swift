@@ -20,8 +20,8 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
 
     //TODO: Declare instance variables here
-    // 2 Implementing a Delegate create object
-    let locationManager = CLLocationManager()
+    let locationManager = CLLocationManager()  // 2 Implementing a Delegate create object
+    let weatherDataModel = WeatherDataModel()
 
     
     //Pre-linked IBOutlets
@@ -52,6 +52,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
         Alamofire.request(url, method: .get, parameters: parameters).responseJSON {
             response in
             if response.result.isSuccess {
+                // successful connection
                 let weatherJSON : JSON = JSON(response.result.value!)
                 // print(weatherJSON)
                 self.updateWeatherData(json: weatherJSON)
@@ -75,7 +76,11 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     //Write the updateWeatherData method here:
     func updateWeatherData(json: JSON) {
-        let tempJSON = json["main"]["temp"]
+        let tempJSON = json["main"]["temp"].double
+        weatherDataModel.temperature = Int(tempJSON! - 273.15) // Converting Kelvin to Celcius
+        weatherDataModel.city = json["name"].stringValue
+        weatherDataModel.condition = json["weather"][0]["id"].intValue
+        weatherDataModel.weatherIconName = weatherDataModel.updateWeatherIcon(condition: weatherDataModel.condition)
     }
 
     
